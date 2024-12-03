@@ -1,0 +1,26 @@
+{
+  "name": "translator-graph",
+  "version": "1.0.0",
+  "description": "Multi-agent translation system using LangGraph",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.20",
+    "@langchain/langgraph": "^0.2.24",
+    "@langchain/openai": "^0.3.14",
+    "cheerio": "^1.0.0-rc.12",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+} 
