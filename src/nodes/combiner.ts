@@ -17,7 +17,7 @@ export async function combineTranslations(state: typeof TranslatorStateAnnotatio
   
   return {
     htmlContent: $.html(),
-    translations, // Return translations array for reference
-    paragraphs: state.paragraphs // Return original paragraphs for reference
+    // translations, // Return translations array for reference
+    // paragraphs: state.paragraphs // Return original paragraphs for reference
   };
 } 

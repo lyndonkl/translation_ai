@@ -16,8 +16,10 @@ const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) =
     // Otherwise, go to translator
     return state.paragraphs.map(
         (paragraph) => new Send("translator", {
-            paragraph,
-            metadata: state.metadata
+            subgraphState: {
+                paragraph,
+                metadata: state.metadata
+            }
         })
     );
 };
