@@ -7,13 +7,16 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "build:watch": "tsc --watch",
+    "link:local": "npm link && cd ./notebooks && npm link translator-graph"
   },
   "dependencies": {
     "@langchain/core": "^0.3.20",
     "@langchain/langgraph": "^0.2.24",
     "@langchain/openai": "^0.3.14",
     "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.1",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
