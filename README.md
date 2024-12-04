@@ -109,3 +109,52 @@ The following environment variables are required:
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Prerequisites for Jupyter Notebook Testing
+
+1. Install Node.js and npm (https://nodejs.org/)
+2. Install Python 3 (https://www.python.org/downloads/)
+3. Install JupyterLab:
+   ```bash
+   pip install jupyterlab
+   ```
+4. Install tslab globally:
+   ```bash
+   npm install -g tslab
+   ```
+5. Verify tslab installation:
+   ```bash
+   tslab install --version
+   ```
+6. Install tslab kernel:
+   ```bash
+   tslab install --python=python3
+   ```
+7. Verify kernel installation:
+   ```bash
+   jupyter kernelspec list
+   ```
+   You should see both `jslab` and `tslab` kernels listed.
+
+## Running in Jupyter Notebook
+
+1. Build and link the package:
+   ```bash
+   npm run build
+   npm run link:local
+   ```
+
+2. Start JupyterLab:
+   ```bash
+   cd notebooks
+   jupyter lab
+   ```
+
+3. Create a new notebook using the TypeScript kernel (tslab)
+
+## Troubleshooting
+
+If you encounter the "Unexpected pending rebuildTimer" error in tslab:
+1. Restart the Jupyter kernel
+2. Make sure the project is built (`npm run build`)
+3. Verify the package is linked (`npm run link:local`)
