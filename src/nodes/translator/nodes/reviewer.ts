@@ -1,6 +1,9 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { TranslatorStateAnnotation } from "../../../state";
+import { TranslatorSubgraphAnnotation } from "../../../state";
 
 const reviewPrompt = PromptTemplate.fromTemplate(`
 Review the following translation from {sourceLanguage} to {targetLanguage}.
@@ -22,9 +25,9 @@ const reviewerModel = new ChatOpenAI({
   temperature: 0.3
 });
 
-export async function reviewer(state: typeof TranslatorStateAnnotation.State) {
-  const translation = state.translations[state.translations.length - 1];
+export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State) {
   const { sourceLanguage, targetLanguage } = state.metadata;
+  const { translation } = state;
 
   const formattedPrompt = await reviewPrompt.format({
     sourceLanguage,
@@ -36,9 +39,9 @@ export async function reviewer(state: typeof TranslatorStateAnnotation.State) {
   const response = await reviewerModel.invoke(formattedPrompt);
   
   return {
-    translations: [{
+    translation: {
       ...translation,
       criticism: response.content
-    }]
+    }
   };
 } 

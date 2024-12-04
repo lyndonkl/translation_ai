@@ -18,5 +18,5 @@ export interface Translation {
   originalContent: string;
   translatedContent: string;
   criticism?: string;
-  refinements?: string[];
+  refinements?: string;
 }

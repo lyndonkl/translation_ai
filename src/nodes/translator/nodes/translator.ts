@@ -3,7 +3,7 @@ dotenv.config();
 
 import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { TranslatorStateAnnotation } from "../../../state";
+import { TranslatorSubgraphAnnotation } from "../../../state";
 
 const translationPrompt = PromptTemplate.fromTemplate(`
 Translate the following text from {sourceLanguage} to {targetLanguage}.
@@ -17,9 +17,9 @@ const translatorModel = new ChatOpenAI({
   temperature: 0.1
 });
 
-export async function mainTranslator(state: typeof TranslatorStateAnnotation.State) {
-  const { content, metadata } = state.paragraphs[0];
-  const { sourceLanguage, targetLanguage } = metadata;
+export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.State) {
+  const { content } = state.paragraph;
+  const { sourceLanguage, targetLanguage } = state.metadata;
 
   const formattedPrompt = await translationPrompt.format({
     sourceLanguage,
@@ -30,10 +30,10 @@ export async function mainTranslator(state: typeof TranslatorStateAnnotation.Sta
   const response = await translatorModel.invoke(formattedPrompt);
   
   return {
-    translations: [{
-      paragraphId: state.paragraphs[0].id,
+    translation: {
+      paragraphId: state.paragraph.id,
       originalContent: content,
       translatedContent: response.content
-    }]
+    }
   };
 } 

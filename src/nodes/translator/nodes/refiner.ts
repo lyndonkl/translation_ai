@@ -1,6 +1,9 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { TranslatorStateAnnotation } from "../../../state";
+import { TranslatorSubgraphAnnotation } from "../../../state";
 
 const refinePrompt = PromptTemplate.fromTemplate(`
 Refine the following translation based on the provided criticism.
@@ -17,8 +20,8 @@ const refinerModel = new ChatOpenAI({
   temperature: 0.2
 });
 
-export async function refiner(state: typeof TranslatorStateAnnotation.State) {
-  const translation = state.translations[state.translations.length - 1];
+export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) {
+  const { translation } = state;
   
   const formattedPrompt = await refinePrompt.format({
     originalText: translation.originalContent,
@@ -31,10 +34,10 @@ export async function refiner(state: typeof TranslatorStateAnnotation.State) {
   const refinements = translation.refinements || [];
   
   return {
-    translations: [{
+    translation: {
       ...translation,
       translatedContent: response.content,
-      refinements: [...refinements, response.content]
-    }]
+      refinements: refinements
+    }
   };
 } 
