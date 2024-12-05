@@ -6,10 +6,11 @@ export async function combineTranslations(state: typeof TranslatorStateAnnotatio
   const $ = load(htmlContent);
   
   translations.forEach(translation => {
-    // Find element by stored path
     const $el = $(translation.path);
     if ($el.length) {
       $el.html(translation.translatedContent);
+    } else {
+      console.log('Failed to find element:', translation.path);
     }
   });
   

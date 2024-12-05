@@ -54,12 +54,14 @@ function getElementPath($: CheerioAPI, $element: Cheerio<any>): string {
     let $current = $element;
     
     while ($current.length) {
-        const tag = $current.prop('tagName')!;
-        const siblings = $current.siblings(tag);
-        const index = siblings.length ? `[${$current.index() + 1}]` : '';
-        path.unshift(`${tag}${index}`);
+        const tag = $current.prop('tagName')!.toLowerCase();
+        const index = $current.index();
+        const selector = $current.siblings(tag).length > 0 ? 
+            `${tag}:nth-child(${index + 1})` : 
+            tag;
+        path.unshift(selector);
         $current = $current.parent();
     }
     
-    return `/${path.join('/')}`;
+    return path.join(' > ');
 } 
