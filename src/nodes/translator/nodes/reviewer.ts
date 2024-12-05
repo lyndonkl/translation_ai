@@ -6,18 +6,29 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { TranslatorSubgraphAnnotation } from "../../../state";
 
 const reviewPrompt = PromptTemplate.fromTemplate(`
-Review the following translation from {sourceLanguage} to {targetLanguage}.
+You are a translation critic. Evaluate the translation based on the original and translated HTML provided below. Both versions preserve all HTML tags and structure. The source language is {sourceLanguage} and the target language is {targetLanguage}. Assess the translation on the following dimensions:
 
-Original text: {originalText}
-Translation: {translatedText}
+1. **Accuracy**: Correctness of translation, including absence of additions, mistranslations, omissions, and untranslated text.
+2. **Fluency**: Proper grammar, spelling, and punctuation in {targetLanguage}, and avoidance of unnecessary repetitions.
+3. **Style**: Consistency with the source text's style and appropriate cultural context.
+4. **Terminology**: Consistent and domain-appropriate use of terminology, including equivalent idioms in {targetLanguage}.
+5. **Consistency**: Uniformity in translation choices throughout the text.
+6. **Readability**: Ease of understanding and natural flow in the target language.
+7. **Formatting**: Preservation of HTML structure, tags, and formatting without introducing errors.
 
-Provide specific criticism about:
-1. Accuracy of translation
-2. Preservation of meaning
-3. Natural flow in target language
-4. Any cultural considerations
+**Note:** 
+- For each dimension, provide multiple bullet-point comments if applicable.
+- Omit any dimension sections that have no criticisms.
+- If there are no criticisms for any of the sections, output NONE in capital letters and nothing else.
+- **Do not include any additional text, explanations, or comments outside the specified format.**
 
-Criticism:
+Provide the criticisms in Markdown format with headers for each dimension and bullet points for each comment.
+
+**Original HTML:**
+{originalText}
+
+**Translated HTML:**
+{translatedText}
 `);
 
 const reviewerModel = new ChatOpenAI({
@@ -26,7 +37,7 @@ const reviewerModel = new ChatOpenAI({
 });
 
 export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State) {
-    const { metadata, translation, paragraph } = state;
+    const { metadata, translation } = state;
     const { sourceLanguage, targetLanguage } = metadata;
 
   const formattedPrompt = await reviewPrompt.format({

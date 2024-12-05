@@ -6,10 +6,19 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { TranslatorSubgraphAnnotation } from "../../../state";
 
 const translationPrompt = PromptTemplate.fromTemplate(`
-Translate the following text from {sourceLanguage} to {targetLanguage}.
-Original text: {text}
+Translate the following HTML from {sourceLanguage} to {targetLanguage}.
 
-Translation:
+- Preserve all HTML tags and attributes unchanged.
+- Only translate the visible text content that is rendered on the screen.
+- Do not translate or modify content within <script> or <style> tags.
+- Maintain all special characters and HTML entities as they are.
+- Preserve the original formatting, indentation, and line breaks.
+- Preserve the writing style, tonality, and information presented in the original text.
+- Preserve any placeholders, variables, or dynamic content within the text.
+- Ensure the output contains only the translated HTML without any additional text, explanations, or comments.
+
+**HTML Content:**
+{text}
 `);
 
 const translatorModel = new ChatOpenAI({
