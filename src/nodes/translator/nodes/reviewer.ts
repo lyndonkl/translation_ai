@@ -48,11 +48,26 @@ export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State)
   });
 
   const response = await reviewerModel.invoke(formattedPrompt);
+
+  const critisimAnalysPrompt =PromptTemplate.fromTemplate(`
+ You are provided with a criticism of a translation. Your task is to analyze the criticism and if the critism does not contain any recommended changes, output "NONE" in capital letters and nothing else. If it does contain recommended changes, output "CHANGES_NEEDED" in capital letters and nothing else.
+
+ **Criticism:**
+ {criticism}
+  `);
+
+  const formattedCritisimAnalysisPrompt = await critisimAnalysPrompt.format({
+    criticism: response.content
+  });
+
+  const criticismAnalysisResponse = await reviewerModel.invoke(formattedCritisimAnalysisPrompt);
+
+  const criticism = criticismAnalysisResponse.content === "NONE" ? "NONE" : response.content;
   
   return {
     translation: {
         ...translation,
-      criticism: response.content
+      criticism: criticism
     }
   };
 } 

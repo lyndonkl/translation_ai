@@ -25,7 +25,8 @@ You are a Translation Editor. Your task is to refine the translated HTML based o
 2. **Preserve HTML Structure**: Do not alter any HTML tags, attributes, scripts, or styles. Only modify the text content intended for user display.
 3. **Maintain Formatting**: Keep the original formatting, indentation, and line breaks intact.
 4. **Preserve Writing Style**: Ensure that the writing style, tone, and information of the original text are maintained in the refined translation.
-5. **PNo Additional Content: Output only the refined translated HTML**: without any additional text, explanations, or comments.
+5. **No Additional Content: Output only the refined translated HTML**: without any additional text, explanations, or comments.
+6. **Handle No Criticism**: If no criticisms are provided, output the original translated HTML as is, without any explanations..
 `);
 
 const refinerModel = new ChatOpenAI({
