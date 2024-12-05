@@ -34,10 +34,12 @@ export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) 
   const refinements = response.content || [];
   
   return {
-    translation: {
-      ...translation,
+    subgraphState: {
+      translation: {
+        ...translation,
       translatedContent: response.content,
-      refinements: refinements
+        refinements: refinements
+      }
     }
   };
 } 

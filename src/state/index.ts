@@ -11,6 +11,7 @@ function reduceParagraphs(current: Paragraph[], update: Paragraph[]) {
 
 export const TranslatorStateAnnotation = Annotation.Root({
   htmlContent: Annotation<string>(),
+  translatedContent: Annotation<string>(),
   metadata: Annotation<TranslationMetadata>(),
   paragraphs: Annotation<Paragraph[]>({
     reducer: reduceParagraphs,
