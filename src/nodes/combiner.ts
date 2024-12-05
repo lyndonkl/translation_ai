@@ -2,20 +2,21 @@ import { load } from 'cheerio';
 import { TranslatorStateAnnotation } from '../state';
 
 export async function combineTranslations(state: typeof TranslatorStateAnnotation.State) {
-  const { htmlContent, translations } = state;
+  const { htmlContent, translations, blocks } = state;
   const $ = load(htmlContent);
   
-  // Replace each paragraph with its translation
-  $('p').each((index, element) => {
-    const translation = translations.find(
-      (t) => t.paragraphId === state.paragraphs[index]?.id
-    );
-    if (translation) {
-      $(element).text(translation.translatedContent);
+  translations.forEach(translation => {
+    // Find element by stored path
+    const $el = $(translation.path);
+    if ($el.length) {
+      $el.html(translation.translatedContent);
     }
   });
   
   return {
-    translatedContent: $.html()
+    translatedContent: $.html(),
+    blocks,
+    translations,
+    htmlContent
   };
 } 

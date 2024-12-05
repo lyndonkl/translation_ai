@@ -1,11 +1,11 @@
 import { START, END, StateGraph, Send } from "@langchain/langgraph";
 import { TranslatorStateAnnotation } from "./state";
 import { parseContent, combineTranslations } from "./nodes";
-import { Paragraph, TranslationMetadata } from "./types";
+import { TranslationMetadata, TranslationBlock } from "./types";
 import { mainTranslator, reviewer, refiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
 
 interface SubgraphStateMap {
-    paragraph: Paragraph;
+    block: TranslationBlock;
     metadata: TranslationMetadata;
 }
 
@@ -15,7 +15,7 @@ const callTranslatorGraph = async (state: SubgraphStateMap) => {
     
     // Transform main state to subgraph state
     const subgraphInput = {
-        paragraph: state.paragraph,
+        block: state.block,
         metadata: state.metadata,
         translation: ""
     };
@@ -31,12 +31,15 @@ const callTranslatorGraph = async (state: SubgraphStateMap) => {
 
 // Function to map paragraphs to translator tasks
 const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
-    if (state.paragraphs.length === 0) {
+    if (state.blocks.length === 0) {
         return new Send("combiner", state);
     }
-    // Send each paragraph to translator node
-    return state.paragraphs.map(
-        (paragraph) => new Send("translatorNode", { paragraph, metadata: state.metadata })
+    // Send each block to translator node
+    return state.blocks.map(
+        (block) => new Send("translatorNode", { 
+            block,
+            metadata: state.metadata 
+        })
     );
 };
 

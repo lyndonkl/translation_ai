@@ -7,14 +7,22 @@ export interface TranslationMetadata {
   style?: string;
 }
 
-export interface Paragraph {
+export interface TranslationBlock {
   id: string;
+  type: string;
   content: string;
+  path: string;
   metadata: TranslationMetadata;
+  context?: {
+    parentType?: string;
+    position: number;
+  }
 }
 
 export interface Translation {
-  paragraphId: string;
+  blockId: string;
+  type: string;
+  path: string;
   originalContent: string;
   translatedContent: string;
   criticism?: string;

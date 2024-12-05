@@ -27,8 +27,8 @@ const translatorModel = new ChatOpenAI({
 });
 
 export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.State) {
-  const { paragraph, metadata } = state;
-  const { content } = paragraph;
+  const { block, metadata } = state;
+  const { content, type, path, id } = block;
   const { sourceLanguage, targetLanguage } = metadata;
 
   const formattedPrompt = await translationPrompt.format({
@@ -41,7 +41,9 @@ export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.
   
   return {
     translation: {
-      paragraphId: paragraph.id,
+      blockId: id,
+      type,
+      path,
       originalContent: content,
       translatedContent: response.content
     }
