@@ -21,7 +21,7 @@ const refinerModel = new ChatOpenAI({
 });
 
 export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) {
-  const { translation } = state.subgraphState;
+  const { translation } = state;
   
   const formattedPrompt = await refinePrompt.format({
     originalText: translation.originalContent,
@@ -34,12 +34,10 @@ export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) 
   const refinements = response.content || [];
   
   return {
-    subgraphState: {
-      translation: {
-        ...translation,
+    translation: {
+      ...translation,
       translatedContent: response.content,
-        refinements: refinements
-      }
+      refinements: refinements
     }
   };
 } 

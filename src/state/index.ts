@@ -23,12 +23,8 @@ export const TranslatorStateAnnotation = Annotation.Root({
   }),
 }); 
 
-export interface SubgraphState {
-  paragraph: Paragraph;
-  metadata: TranslationMetadata;
-  translation: Translation;
-}
-
 export const TranslatorSubgraphAnnotation = Annotation.Root({
-    subgraphState: Annotation<SubgraphState>(),
+    metadata: Annotation<TranslationMetadata>(),
+    paragraph: Annotation<Paragraph>(),
+    translation: Annotation<Translation>(),
 });

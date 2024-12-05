@@ -1,26 +1,42 @@
 import { START, END, StateGraph, Send } from "@langchain/langgraph";
 import { TranslatorStateAnnotation } from "./state";
 import { parseContent, combineTranslations } from "./nodes";
-import { TranslationMetadata } from "./types";
+import { Paragraph, TranslationMetadata } from "./types";
 import { mainTranslator, reviewer, refiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
+
+interface SubgraphStateMap {
+    paragraph: Paragraph;
+    metadata: TranslationMetadata;
+}
+
+// Function to call translator subgraph and transform state
+const callTranslatorGraph = async (state: SubgraphStateMap) => {
+    const translatorSubgraph = createTranslatorSubgraph();
+    
+    // Transform main state to subgraph state
+    const subgraphInput = {
+        paragraph: state.paragraph,
+        metadata: state.metadata,
+        translation: ""
+    };
+
+    // Call subgraph
+    const subgraphOutput = await translatorSubgraph.invoke(subgraphInput);
+    
+    // Transform subgraph output back to main state
+    return {
+        translations: [subgraphOutput.translation]
+    };
+};
 
 // Function to map paragraphs to translator tasks
 const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
-    // Go to combiner if not paragraphs
     if (state.paragraphs.length === 0) {
-        return new Send("combiner", {
-            paragraphs: state.paragraphs,
-            translations: state.translations,
-        });
+        return new Send("combiner", state);
     }
-    // Otherwise, go to translator
+    // Send each paragraph to translator node
     return state.paragraphs.map(
-        (paragraph) => new Send("translator", {
-            subgraphState: {
-                paragraph,
-                metadata: state.metadata
-            }
-        })
+        (paragraph) => new Send("translatorNode", { paragraph, metadata: state.metadata })
     );
 };
 
@@ -39,19 +55,17 @@ export function createTranslatorSubgraph() {
 }
 
 export function createTranslationGraph() {
-    const translatorSubgraph = createTranslatorSubgraph();
-
     const graph = new StateGraph(TranslatorStateAnnotation)
         .addNode("parser", parseContent)
-        .addNode("translator", translatorSubgraph)
+        .addNode("translatorNode", callTranslatorGraph)
         .addNode("combiner", combineTranslations)
         .addEdge(START, "parser")
         .addConditionalEdges(
             "parser",
             continueToTranslations,
-            ["translator", "combiner"]
+            ["translatorNode", "combiner"]
         )
-        .addEdge("translator", "combiner")
+        .addEdge("translatorNode", "combiner")
         .addEdge("combiner", END)
         .compile();
 
