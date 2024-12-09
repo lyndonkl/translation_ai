@@ -9,9 +9,10 @@ interface SubgraphStateMap {
     metadata: TranslationMetadata;
 }
 
+const translatorSubgraph = createTranslatorSubgraph();
+
 // Function to call translator subgraph and transform state
 const callTranslatorGraph = async (state: SubgraphStateMap) => {
-    const translatorSubgraph = createTranslatorSubgraph();
     
     // Transform main state to subgraph state
     const subgraphInput = {
@@ -89,4 +90,8 @@ export async function translateContent(
   });
   
   return result;
-} 
+}
+
+const translatorGraph = createTranslationGraph();
+
+export { translatorGraph };
