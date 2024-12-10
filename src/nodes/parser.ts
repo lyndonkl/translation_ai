@@ -15,7 +15,7 @@ const TRANSLATABLE_SELECTORS = [
     'label'
 ].join(', ');
 
-export async function parseContent(state: typeof TranslatorStateAnnotation.State) {
+export async function parseContent(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
     const { htmlContent, metadata } = state;
     const $ = load(htmlContent);
     const blocks: TranslationBlock[] = [];

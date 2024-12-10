@@ -26,7 +26,7 @@ const translatorModel = new ChatOpenAI({
   temperature: 0.1
 });
 
-export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.State) {
+export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
   const { block, metadata } = state;
   const { content, type, path, id } = block;
   const { sourceLanguage, targetLanguage } = metadata;
@@ -45,7 +45,7 @@ export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.
       type,
       path,
       originalContent: content,
-      translatedContent: response.content
+      translatedContent: response.content.toString()
     }
   };
 } 

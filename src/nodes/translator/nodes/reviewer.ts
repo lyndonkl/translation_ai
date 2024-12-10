@@ -36,7 +36,7 @@ const reviewerModel = new ChatOpenAI({
   temperature: 0.3
 });
 
-export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State) {
+export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
     const { metadata, translation } = state;
     const { sourceLanguage, targetLanguage } = metadata;
 
@@ -67,7 +67,7 @@ export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State)
   return {
     translation: {
         ...translation,
-      criticism: criticism
+      criticism: criticism.toString()
     }
   };
 } 

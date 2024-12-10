@@ -34,7 +34,7 @@ const refinerModel = new ChatOpenAI({
   temperature: 0.2
 });
 
-export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) {
+export async function refiner(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
   const { translation, metadata } = state;
 
   if (translation.criticism === "NONE") {
@@ -63,8 +63,8 @@ export async function refiner(state: typeof TranslatorSubgraphAnnotation.State) 
   return {
     translation: {
       ...translation,
-      translatedContent: response.content,
-      refinements: refinements
+      translatedContent: translation.translatedContent,
+      refinements: refinements.toString()
     }
   };
 } 

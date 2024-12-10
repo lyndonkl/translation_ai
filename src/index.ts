@@ -12,7 +12,7 @@ interface SubgraphStateMap {
 const translatorSubgraph = createTranslatorSubgraph();
 
 // Function to call translator subgraph and transform state
-const callTranslatorGraph = async (state: SubgraphStateMap) => {
+const callTranslatorGraph = async (state: SubgraphStateMap): Promise<Partial<typeof TranslatorStateAnnotation.State>> => {
     
     // Transform main state to subgraph state
     const subgraphInput = {
@@ -22,12 +22,10 @@ const callTranslatorGraph = async (state: SubgraphStateMap) => {
     };
 
     // Call subgraph
-    const subgraphOutput = await translatorSubgraph.invoke(subgraphInput);
-    
-    // Transform subgraph output back to main state
-    return {
-        translations: [subgraphOutput.translation]
-    };
+    return translatorSubgraph.invoke(subgraphInput)
+        .then(subgraphOutput => ({
+            translations: [subgraphOutput.translation]
+        }));
 };
 
 // Function to map paragraphs to translator tasks
