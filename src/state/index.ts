@@ -21,10 +21,22 @@ export const TranslatorStateAnnotation = Annotation.Root({
     reducer: reduceTranslations,
     default: () => [],
   }),
+  plainText: Annotation<boolean>({
+    reducer: (current, update) => update,
+    default: () => false,
+  }),
+  fastTranslate: Annotation<boolean>({
+    reducer: (current, update) => update,
+    default: () => false,
+  }),
 }); 
 
 export const TranslatorSubgraphAnnotation = Annotation.Root({
     metadata: Annotation<TranslationMetadata>(),
     block: Annotation<TranslationBlock>(),
     translation: Annotation<Translation>(),
+    fastTranslate: Annotation<boolean>({
+        reducer: (current, update) => update,
+        default: () => false,
+    }),
 });

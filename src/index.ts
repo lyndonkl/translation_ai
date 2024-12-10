@@ -37,7 +37,8 @@ const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) =
     return state.blocks.map(
         (block) => new Send("translatorNode", { 
             block,
-            metadata: state.metadata 
+            metadata: state.metadata,
+            fastTranslate: state.fastTranslate
         })
     );
 };
@@ -77,6 +78,8 @@ export function createTranslationGraph() {
 export async function translateContent(
   htmlContent: string,
   metadata: TranslationMetadata,
+  plainText: boolean,
+  fastTranslate: boolean
 ) {
   const graph = createTranslationGraph();
   const result = await graph.invoke({
@@ -85,6 +88,8 @@ export async function translateContent(
     paragraphs: [],
     translations: [],
     messages: [],
+    plainText,
+    fastTranslate
   });
   
   return result;

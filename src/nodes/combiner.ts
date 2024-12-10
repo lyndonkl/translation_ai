@@ -2,7 +2,17 @@ import { load } from 'cheerio';
 import { TranslatorStateAnnotation } from '../state';
 
 export async function combineTranslations(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
-  const { htmlContent, translations, blocks } = state;
+  const { htmlContent, translations, blocks, plainText } = state;
+
+  if (plainText) {
+    return {
+      translatedContent: translations[0].translatedContent,
+      blocks,
+      translations,
+      htmlContent
+    };
+  }
+
   const $ = load(htmlContent);
   
   translations.forEach(translation => {

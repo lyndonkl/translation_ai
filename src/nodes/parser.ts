@@ -16,11 +16,24 @@ const TRANSLATABLE_SELECTORS = [
 ].join(', ');
 
 export async function parseContent(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
-    const { htmlContent, metadata } = state;
+    const { htmlContent, metadata, plainText, fastTranslate } = state;
     const $ = load(htmlContent);
     const blocks: TranslationBlock[] = [];
 
-    $(TRANSLATABLE_SELECTORS).each((index, element) => {
+    if (plainText) {
+        blocks.push({
+            id: uuidv4(),
+            type: 'text',
+            content: htmlContent,
+            path: 'NONE',
+            metadata,
+            context: {
+                parentType: 'NONE',
+                position: 0
+            }
+        })
+    } else {
+        $(TRANSLATABLE_SELECTORS).each((index, element) => {
         const $el = $(element);
         
         // Skip hidden elements
@@ -41,8 +54,9 @@ export async function parseContent(state: typeof TranslatorStateAnnotation.State
                 parentType: $el.parent().prop('tagName')?.toLowerCase(),
                 position: index
             }
+            });
         });
-    });
+    }
 
     return {
         blocks

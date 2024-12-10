@@ -27,7 +27,7 @@ const translatorModel = new ChatOpenAI({
 });
 
 export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
-  const { block, metadata } = state;
+  const { block, metadata, fastTranslate } = state;
   const { content, type, path, id } = block;
   const { sourceLanguage, targetLanguage } = metadata;
 
@@ -38,6 +38,20 @@ export async function mainTranslator(state: typeof TranslatorSubgraphAnnotation.
   });
 
   const response = await translatorModel.invoke(formattedPrompt);
+  
+  if (fastTranslate) {
+    return {
+      translation: {
+        blockId: id,
+        type,
+        path,
+        originalContent: content,
+        translatedContent: response.content.toString(),
+        criticism: "NONE",
+        refinements: response.content.toString()
+      }
+    };
+  }
   
   return {
     translation: {
