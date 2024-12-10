@@ -9,6 +9,13 @@ interface SubgraphStateMap {
     metadata: TranslationMetadata;
 }
 
+const continueFromTranslator = (state: typeof TranslatorSubgraphAnnotation.State) => {
+    if (state.fastTranslate) {
+        return END;
+    }
+    return "reviewer";
+};
+
 const translatorSubgraph = createTranslatorSubgraph();
 
 // Function to call translator subgraph and transform state
@@ -49,7 +56,14 @@ export function createTranslatorSubgraph() {
         .addNode("reviewer", reviewer)
         .addNode("refiner", refiner)
         .addEdge(START, "translator")
-        .addEdge("translator", "reviewer")
+        .addConditionalEdges(
+            "translator",
+            continueFromTranslator,
+            {
+                "reviewer": "reviewer",
+                END: END
+            }
+        )
         .addEdge("reviewer", "refiner")
         .addEdge("refiner", END)
         .compile();
