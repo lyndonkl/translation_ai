@@ -40,11 +40,23 @@ async function generateHtml(folderPath: string) {
         .tooltip {
             visibility: hidden;
             position: absolute;
-            z-index: 1;
-            max-width: 500px;
+            right: -20px;
+            top: 0;
+            z-index: 10;
+            width: 300px;
         }
-        .tooltip-trigger:hover + .tooltip {
+        .paragraph-container {
+            position: relative;
+        }
+        .paragraph-container:hover .tooltip {
             visibility: visible;
+        }
+        .tooltip-icon {
+            position: absolute;
+            right: -25px;
+            top: 0;
+            cursor: pointer;
+            color: #6B7280;
         }
         .translation-section {
             display: none;
@@ -70,37 +82,34 @@ async function generateHtml(folderPath: string) {
             return `
             <div id="${lang}-section" class="translation-section ${lang === 'spanish' ? 'active' : ''} mb-12 bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-2xl font-bold mb-4">English → ${lang.charAt(0).toUpperCase() + lang.slice(1)}</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="original">
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="original space-y-4">
                         <h3 class="text-lg font-semibold mb-2">Original</h3>
-                        <div class="prose">${output?.htmlContent || ''}</div>
-                    </div>
-                    <div class="translation">
-                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
-                        <div class="prose">${output?.translatedContent || ''}</div>
-                    </div>
-                </div>
-                <div class="mt-8">
-                    <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
-                    ${output?.translations.map((t: Translation) => `
-                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
-                            <p class="font-medium">${t.type}: ${t.path}</p>
-                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
-                                <p class="font-semibold">Original:</p>
-                                <p class="mb-2">${t.originalContent}</p>
-                                <p class="font-semibold">Translation:</p>
-                                <p class="mb-2">${t.translatedContent}</p>
-                                ${t.criticism && t.criticism !== 'NONE' ? `
-                                    <p class="font-semibold">Criticism:</p>
-                                    <p class="mb-2">${t.criticism}</p>
-                                ` : ''}
-                                ${t.refinements ? `
-                                    <p class="font-semibold">Refinements:</p>
-                                    <p>${t.refinements}</p>
-                                ` : ''}
+                        ${output?.translations.map((t: Translation) => `
+                            <div class="paragraph-container prose relative">
+                                <div class="tooltip-icon">ℹ️</div>
+                                <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                    <div class="font-semibold mb-2">Translation Details:</div>
+                                    <div class="text-sm space-y-2">
+                                        <p><span class="font-medium">Initial:</span> ${t.translatedContent}</p>
+                                        <p><span class="font-medium">Criticism:</span> ${t.criticism || 'NONE'}</p>
+                                        ${t.refinements ? `
+                                            <p><span class="font-medium">Final:</span> ${t.refinements}</p>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                ${t.originalContent}
                             </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
+                    <div class="translation space-y-4">
+                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
+                        ${output?.translations.map((t: Translation) => `
+                            <div class="prose">
+                                ${t.refinements || t.translatedContent}
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         `}).join('')}
@@ -108,12 +117,9 @@ async function generateHtml(folderPath: string) {
 
     <script>
         document.getElementById('languageSelect').addEventListener('change', function(e) {
-            // Hide all sections
             document.querySelectorAll('.translation-section').forEach(section => {
                 section.classList.remove('active');
             });
-            
-            // Show selected section
             const selectedLang = this.value;
             document.getElementById(selectedLang + '-section').classList.add('active');
         });
