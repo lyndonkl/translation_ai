@@ -1,0 +1,60 @@
+{
+  "htmlContent": "Your test content",
+  "translatedContent": "Tu contenido de prueba",
+  "metadata": {
+    "sourceLanguage": "english",
+    "targetLanguage": "spanish"
+  },
+  "blocks": [
+    {
+      "id": "4f020880-67ea-4a55-a9f1-ade567ab4c1d",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "spanish"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    },
+    {
+      "id": "4f020880-67ea-4a55-a9f1-ade567ab4c1d",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "spanish"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    }
+  ],
+  "translations": [
+    {
+      "blockId": "4f020880-67ea-4a55-a9f1-ade567ab4c1d",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "Tu contenido de prueba",
+      "criticism": "NONE",
+      "refinements": "Tu contenido de prueba"
+    },
+    {
+      "blockId": "4f020880-67ea-4a55-a9f1-ade567ab4c1d",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "Tu contenido de prueba",
+      "criticism": "NONE",
+      "refinements": "Tu contenido de prueba"
+    }
+  ],
+  "plainText": true,
+  "fastTranslate": false
+}

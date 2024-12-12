@@ -1,0 +1,60 @@
+{
+  "htmlContent": "Your test content",
+  "translatedContent": "Nội dung kiểm tra của bạn",
+  "metadata": {
+    "sourceLanguage": "english",
+    "targetLanguage": "vietnamese"
+  },
+  "blocks": [
+    {
+      "id": "f94dcee0-c685-472f-ae2b-524a964555ec",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "vietnamese"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    },
+    {
+      "id": "f94dcee0-c685-472f-ae2b-524a964555ec",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "vietnamese"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    }
+  ],
+  "translations": [
+    {
+      "blockId": "f94dcee0-c685-472f-ae2b-524a964555ec",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "Nội dung kiểm tra của bạn",
+      "criticism": "NONE",
+      "refinements": "Nội dung kiểm tra của bạn"
+    },
+    {
+      "blockId": "f94dcee0-c685-472f-ae2b-524a964555ec",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "Nội dung kiểm tra của bạn",
+      "criticism": "NONE",
+      "refinements": "Nội dung kiểm tra của bạn"
+    }
+  ],
+  "plainText": true,
+  "fastTranslate": false
+}

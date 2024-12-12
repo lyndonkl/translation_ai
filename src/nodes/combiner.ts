@@ -6,7 +6,7 @@ export async function combineTranslations(state: typeof TranslatorStateAnnotatio
 
   if (plainText) {
     return {
-      translatedContent: translations[0].translatedContent,
+      translatedContent: translations.map(t => t.translatedContent).join('\n\n'),
       blocks,
       translations,
       htmlContent

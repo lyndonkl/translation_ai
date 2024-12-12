@@ -21,17 +21,20 @@ export async function parseContent(state: typeof TranslatorStateAnnotation.State
     const blocks: TranslationBlock[] = [];
 
     if (plainText) {
-        blocks.push({
-            id: uuidv4(),
-            type: 'text',
-            content: htmlContent,
-            path: 'NONE',
-            metadata,
-            context: {
-                parentType: 'NONE',
-                position: 0
-            }
-        })
+        const textBlocks = htmlContent.split('\n\n').filter(text => text.trim());
+        textBlocks.forEach((text, index) => {
+            blocks.push({
+                id: uuidv4(),
+                type: 'text',
+                content: text,
+                path: 'NONE',
+                metadata,
+                context: {
+                    parentType: 'NONE',
+                    position: index
+                }
+            });
+        });
     } else {
         $(TRANSLATABLE_SELECTORS).each((index, element) => {
         const $el = $(element);

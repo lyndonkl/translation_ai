@@ -1,0 +1,60 @@
+{
+  "htmlContent": "Your test content",
+  "translatedContent": "你的测试内容",
+  "metadata": {
+    "sourceLanguage": "english",
+    "targetLanguage": "chinese"
+  },
+  "blocks": [
+    {
+      "id": "8a401627-70b3-43a8-9b4c-4e145d57c262",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "chinese"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    },
+    {
+      "id": "8a401627-70b3-43a8-9b4c-4e145d57c262",
+      "type": "text",
+      "content": "Your test content",
+      "path": "NONE",
+      "metadata": {
+        "sourceLanguage": "english",
+        "targetLanguage": "chinese"
+      },
+      "context": {
+        "parentType": "NONE",
+        "position": 0
+      }
+    }
+  ],
+  "translations": [
+    {
+      "blockId": "8a401627-70b3-43a8-9b4c-4e145d57c262",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "你的测试内容",
+      "criticism": "NONE",
+      "refinements": "你的测试内容"
+    },
+    {
+      "blockId": "8a401627-70b3-43a8-9b4c-4e145d57c262",
+      "type": "text",
+      "path": "NONE",
+      "originalContent": "Your test content",
+      "translatedContent": "你的测试内容",
+      "criticism": "NONE",
+      "refinements": "你的测试内容"
+    }
+  ],
+  "plainText": true,
+  "fastTranslate": false
+}

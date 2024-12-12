@@ -9,7 +9,9 @@
     "test": "jest",
     "dev": "ts-node src/index.ts",
     "build:watch": "tsc --watch",
-    "link:local": "npm link && cd ./notebooks && npm link translator-graph"
+    "link:local": "npm link && cd ./notebooks && npm link translator-graph",
+    "analyze": "ts-node analysis/translate.ts",
+    "render": "ts-node analysis/render.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.20",
