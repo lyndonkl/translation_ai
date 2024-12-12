@@ -1,5 +1,17 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { Translation } from '../src/types';
+
+interface TranslationOutput {
+  htmlContent: string;
+  translatedContent: string;
+  translations: Translation[];
+}
+
+interface LanguageOutput {
+  language: string;
+  data: TranslationOutput;
+}
 
 async function generateHtml(folderPath: string) {
   const languages = ['spanish', 'arabic', 'vietnamese', 'chinese'];
@@ -11,7 +23,7 @@ async function generateHtml(folderPath: string) {
       );
       return {
         language: lang,
-        data: JSON.parse(content)
+        data: JSON.parse(content) as TranslationOutput
       };
     })
   );
@@ -70,7 +82,7 @@ async function generateHtml(folderPath: string) {
                 </div>
                 <div class="mt-8">
                     <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
-                    ${output?.translations.map(t => `
+                    ${output?.translations.map((t: Translation) => `
                         <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
                             <p class="font-medium">${t.type}: ${t.path}</p>
                             <div class="tooltip bg-white border p-4 rounded shadow-lg">

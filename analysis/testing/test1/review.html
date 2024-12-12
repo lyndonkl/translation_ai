@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1;
+            max-width: 500px;
+        }
+        .tooltip-trigger:hover + .tooltip {
+            visibility: visible;
+        }
+        .translation-section {
+            display: none;
+        }
+        .translation-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-6">
+            <label for="languageSelect" class="block text-sm font-medium text-gray-700">Select Language:</label>
+            <select id="languageSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="spanish">Spanish</option><option value="arabic">Arabic</option><option value="vietnamese">Vietnamese</option><option value="chinese">Chinese</option>
+            </select>
+        </div>
+
+        
+            <div id="spanish-section" class="translation-section active mb-12 bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">English → Spanish</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="original">
+                        <h3 class="text-lg font-semibold mb-2">Original</h3>
+                        <div class="prose">Your test content</div>
+                    </div>
+                    <div class="translation">
+                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
+                        <div class="prose">Tu contenido de prueba</div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">Tu contenido de prueba</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>Tu contenido de prueba</p>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">Tu contenido de prueba</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>Tu contenido de prueba</p>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div id="arabic-section" class="translation-section  mb-12 bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">English → Arabic</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="original">
+                        <h3 class="text-lg font-semibold mb-2">Original</h3>
+                        <div class="prose">Your test content</div>
+                    </div>
+                    <div class="translation">
+                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
+                        <div class="prose">محتوى الاختبار الخاص بك</div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">محتوى الاختبار الخاص بك</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>محتوى الاختبار الخاص بك</p>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">محتوى الاختبار الخاص بك</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>محتوى الاختبار الخاص بك</p>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div id="vietnamese-section" class="translation-section  mb-12 bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">English → Vietnamese</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="original">
+                        <h3 class="text-lg font-semibold mb-2">Original</h3>
+                        <div class="prose">Your test content</div>
+                    </div>
+                    <div class="translation">
+                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
+                        <div class="prose">Nội dung kiểm tra của bạn</div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">Nội dung kiểm tra của bạn</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>Nội dung kiểm tra của bạn</p>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">Nội dung kiểm tra của bạn</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>Nội dung kiểm tra của bạn</p>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div id="chinese-section" class="translation-section  mb-12 bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">English → Chinese</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="original">
+                        <h3 class="text-lg font-semibold mb-2">Original</h3>
+                        <div class="prose">Your test content</div>
+                    </div>
+                    <div class="translation">
+                        <h3 class="text-lg font-semibold mb-2">Translation</h3>
+                        <div class="prose">你的测试内容</div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Translation Details</h3>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">你的测试内容</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>你的测试内容</p>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="mb-4 p-4 bg-gray-50 rounded relative tooltip-trigger">
+                            <p class="font-medium">text: NONE</p>
+                            <div class="tooltip bg-white border p-4 rounded shadow-lg">
+                                <p class="font-semibold">Original:</p>
+                                <p class="mb-2">Your test content</p>
+                                <p class="font-semibold">Translation:</p>
+                                <p class="mb-2">你的测试内容</p>
+                                
+                                
+                                    <p class="font-semibold">Refinements:</p>
+                                    <p>你的测试内容</p>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+    </div>
+
+    <script>
+        document.getElementById('languageSelect').addEventListener('change', function(e) {
+            // Hide all sections
+            document.querySelectorAll('.translation-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const selectedLang = this.value;
+            document.getElementById(selectedLang + '-section').classList.add('active');
+        });
+    </script>
+</body>
+</html>
