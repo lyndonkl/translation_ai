@@ -4,22 +4,26 @@ import * as path from 'path';
 
 const TARGET_LANGUAGES = ['spanish', 'arabic', 'vietnamese', 'chinese'];
 
-interface TranslationOutput {
-  htmlContent: string;
-  translatedContent: string;
-  translations: Array<{
-    blockId: string;
-    type: string;
-    path: string;
-    originalContent: string;
-    translatedContent: string;
-    criticism?: string;
-    refinements?: string;
-  }>;
+async function hasAllOutputFiles(folderPath: string): Promise<boolean> {
+  try {
+    const files = await fs.readdir(folderPath);
+    return TARGET_LANGUAGES.every(lang => 
+      files.includes(`output_${lang}.json`)
+    );
+  } catch (error) {
+    return false;
+  }
 }
 
 async function processFolder(folderPath: string) {
   try {
+    // Check if all output files exist
+    const hasOutputs = await hasAllOutputFiles(folderPath);
+    if (hasOutputs) {
+      console.log(`Skipping ${folderPath} - outputs already exist`);
+      return;
+    }
+
     const inputPath = path.join(folderPath, 'input.txt');
     const htmlContent = await fs.readFile(inputPath, 'utf-8');
 
