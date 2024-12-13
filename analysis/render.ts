@@ -13,20 +13,49 @@ interface LanguageOutput {
   data: TranslationOutput;
 }
 
+async function hasOutputFiles(folderPath: string): Promise<boolean> {
+  try {
+    const files = await fs.readdir(folderPath);
+    return files.some(file => file.startsWith('output_') && file.endsWith('.json'));
+  } catch (error) {
+    return false;
+  }
+}
+
 async function generateHtml(folderPath: string) {
+  // Check for output files first
+  const hasOutputs = await hasOutputFiles(folderPath);
+  if (!hasOutputs) {
+    console.log(`Skipping ${folderPath} - no output files found`);
+    return;
+  }
+
   const languages = ['spanish', 'arabic', 'vietnamese', 'chinese'];
   const outputs = await Promise.all(
     languages.map(async lang => {
-      const content = await fs.readFile(
-        path.join(folderPath, `output_${lang}.json`),
-        'utf-8'
-      );
-      return {
-        language: lang,
-        data: JSON.parse(content) as TranslationOutput
-      };
+      try {
+        const content = await fs.readFile(
+          path.join(folderPath, `output_${lang}.json`),
+          'utf-8'
+        );
+        return {
+          language: lang,
+          data: JSON.parse(content) as TranslationOutput
+        };
+      } catch (error) {
+        console.log(`Warning: Missing output for ${lang} in ${folderPath}`);
+        return null;
+      }
     })
   );
+
+  // Filter out any null results from missing files
+  const validOutputs = outputs.filter((output): output is LanguageOutput => output !== null);
+  
+  if (validOutputs.length === 0) {
+    console.log(`Skipping ${folderPath} - no valid output files`);
+    return;
+  }
 
   const html = `
 <!DOCTYPE html>
@@ -118,12 +147,12 @@ async function generateHtml(folderPath: string) {
         </div>
 
         ${languages.map(lang => {
-            const output = outputs.find(o => o.language === lang)?.data;
+            const output = validOutputs.find(o => o.language === lang)?.data;
             return `
             <div id="${lang}-section" class="translation-section ${lang === 'spanish' ? 'active' : ''} mb-12 bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-2xl font-bold mb-4">English → ${lang.charAt(0).toUpperCase() + lang.slice(1)}</h2>
                 <div class="translations-list">
-                    ${output?.translations.map((t: Translation) => `
+                    ${output?.translations?.map((t: Translation) => `
                         <div class="translation-container">
                             <div class="tooltip-icon">ℹ️</div>
                             <div class="translation-pair">
@@ -159,7 +188,7 @@ async function generateHtml(folderPath: string) {
                                 </div>
                             </div>
                         </div>
-                    `).join('')}
+                    `).join('') || ''}
                 </div>
             </div>
         `}).join('')}
