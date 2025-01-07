@@ -11,20 +11,14 @@ export interface TranslationBlock {
   id: string;
   type: string;
   content: string;
+  translation?: string;
   path: string;
-  metadata: TranslationMetadata;
   context?: {
     parentType?: string;
     position: number;
   }
 }
 
-export interface Translation {
-  blockId: string;
-  type: string;
-  path: string;
-  originalContent: string;
-  translatedContent: string;
-  criticism?: string;
-  refinements?: string;
+export interface IndexToBlockId {
+  [key: number]: string;
 }

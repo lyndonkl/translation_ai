@@ -32,7 +32,7 @@ Provide the criticisms in Markdown format with headers for each dimension and bu
 `);
 
 const reviewerModel = new ChatOpenAI({
-  modelName: "gpt-4",
+  modelName: "gpt-4o",
   temperature: 0.3
 });
 

@@ -1,6 +1,6 @@
 import { load, CheerioAPI, Cheerio } from 'cheerio';
 import { v4 as uuidv4 } from 'uuid';
-import { TranslationBlock } from '../types';
+import { TranslationBlock, IndexToBlockId } from '../types';
 import { TranslatorStateAnnotation } from '../state';
 
 const TRANSLATABLE_SELECTORS = [
@@ -16,53 +16,52 @@ const TRANSLATABLE_SELECTORS = [
 ].join(', ');
 
 export async function parseContent(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
-    const { htmlContent, metadata, plainText, fastTranslate } = state;
-    const $ = load(htmlContent);
+    const { input, metadata, plainText } = state;
     const blocks: TranslationBlock[] = [];
-
+    const indexToBlockId: IndexToBlockId = {};
     if (plainText) {
-        const textBlocks = htmlContent.split('\n\n').filter(text => text.trim());
-        textBlocks.forEach((text, index) => {
+        blocks.push({
+            id: uuidv4(),
+            type: 'text',
+            content: input,
+            path: 'NONE',
+            context: {
+                parentType: 'NONE',
+                position: 0
+            }
+        });
+    } else {
+        const $ = load(input);
+        $(TRANSLATABLE_SELECTORS).each((index, element) => {
+            const $el = $(element);
+            
+            // Skip hidden elements
+            if ($el.css('display') === 'none' || $el.css('visibility') === 'hidden') {
+                return;
+            }
+
+            const content = $el.html()?.trim();
+            if (!content) return;
+
+            const id = uuidv4();
             blocks.push({
-                id: uuidv4(),
-                type: 'text',
-                content: text,
-                path: 'NONE',
-                metadata,
+                id,
+                type: $el.prop('tagName')!.toLowerCase(),
+                content,
+                path: getElementPath($, $el),
                 context: {
-                    parentType: 'NONE',
+                    parentType: $el.parent().prop('tagName')?.toLowerCase(),
                     position: index
                 }
             });
-        });
-    } else {
-        $(TRANSLATABLE_SELECTORS).each((index, element) => {
-        const $el = $(element);
-        
-        // Skip hidden elements
-        if ($el.css('display') === 'none' || $el.css('visibility') === 'hidden') {
-            return;
-        }
-
-        const content = $el.html()?.trim();
-        if (!content) return;
-
-        blocks.push({
-            id: uuidv4(),
-            type: $el.prop('tagName')!.toLowerCase(),
-            content,
-            path: getElementPath($, $el),
-            metadata,
-            context: {
-                parentType: $el.parent().prop('tagName')?.toLowerCase(),
-                position: index
-            }
-            });
+            
+            indexToBlockId[index] = id;
         });
     }
 
     return {
-        blocks
+        blocks,
+        indexToBlockId
     };
 }
 
