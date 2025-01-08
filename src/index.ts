@@ -5,6 +5,15 @@ import { TranslationMetadata, TranslationBlock } from "./types";
 import { mainTranslator, reviewer, refiner, combiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
 import { USER_REFINER } from "./constants";
 
+const passToNextState = (state: typeof TranslatorSubgraphAnnotation.State): string => {
+    const currentState = state.currentState;
+
+    if (currentState === USER_REFINER) {
+        return "combiner";
+    }
+    return currentState.endsWith("REVIEWER") ? "reviewer" : "refiner";
+};
+
 const translatorSubgraph = createTranslatorSubgraph();
 
 // Function to call translator subgraph and transform state
@@ -41,24 +50,6 @@ const callTranslatorGraph = async (state: typeof TranslatorStateAnnotation.State
         });
 };
 
-// Function to map paragraphs to translator tasks
-const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
-    if (state.blocks.length === 0) {
-        return "combiner";
-    }
-    // Send each block to translator node
-        return "translatorNode";
-};
-
-const continueToReviewer = (state: typeof TranslatorSubgraphAnnotation.State): string => {
-    const currentState = state.currentState;
-
-    if (currentState === USER_REFINER) {
-        return "combiner";
-    }
-    return currentState.endsWith("REVIEWER") ? "reviewer" : "refiner";
-};
-
 export function createTranslatorSubgraph() {
     const translatorGraph = new StateGraph(TranslatorSubgraphAnnotation)
         .addNode("translator", mainTranslator)
@@ -66,19 +57,14 @@ export function createTranslatorSubgraph() {
         .addNode("refiner", refiner)
         .addNode("combiner", combiner)
         .addEdge(START, "translator")
-        .addConditionalEdges(
-            "translator",
-            continueToReviewer,
-            {
-                "refiner": "refiner",
-                "combiner": "combiner"
-            }
-        )
+        .addEdge("translator", "reviewer")
+        .addEdge("reviewer", "refiner")
         .addConditionalEdges(
             "refiner",
-            continueToReviewer,
+            passToNextState,
             {
                 "reviewer": "reviewer",
+                "refiner": "refiner",
                 "combiner": "combiner"
             }
         )
@@ -87,6 +73,16 @@ export function createTranslatorSubgraph() {
 
     return translatorGraph;
 }
+
+// Function to map paragraphs to translator tasks
+const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
+    if (state.blocks.length === 0) {
+        return "combiner";
+    }
+
+    // Send each block to translator node
+    return "translatorNode";
+};
 
 export function createTranslationGraph() {
     const graph = new StateGraph(TranslatorStateAnnotation)

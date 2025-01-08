@@ -24,6 +24,12 @@ export async function refiner(state: typeof TranslatorSubgraphAnnotation.State):
   const { sourceLanguage, targetLanguage } = metadata;
   const criticism = criticisms[criticisms.length - 1];
 
+  if (criticism === "NONE") {
+    return {
+      currentState: state.nextState[state.currentState],
+    };
+  }
+
   const systemPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][SYSTEM_PROMPT]);
   const userPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][USER_PROMPT]);
 

@@ -55,29 +55,11 @@ export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State)
 
   const criticism = criticismAnalysisResponse.content === "NONE" ? "NONE" : response.content;
 
-  if (criticism === "NONE") {
-    return {
-      currentState: state.nextState[state.nextState[state.currentState]],
-      criticisms: [
-        ...criticisms,
-        criticism.toString()
-      ],
-      intermediateTranslation: [
-        ...state.intermediateTranslation,
-        translation
-      ]
-    };
-  } else {
-    return {
-      currentState: state.nextState[state.currentState],
-      criticisms: [
-        ...criticisms,
-        criticism.toString()
-      ],
-      intermediateTranslation: [
-        ...state.intermediateTranslation,
-        translation
-      ]
-    };
-  }
+  return {
+    currentState: state.nextState[state.currentState],
+    criticisms: [
+      ...criticisms,
+      criticism.toString()
+    ],
+  };
 } 
