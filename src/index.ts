@@ -43,9 +43,9 @@ const callTranslatorGraph = async (state: typeof TranslatorStateAnnotation.State
                         }
                         return block;
                     }),
-                criticism: subgraphOutput.criticism,
-                intermediateTranslation: subgraphOutput.translation,
-                finalTranslation: subgraphOutput.refinements
+                criticisms: subgraphOutput.criticisms,
+                intermediateTranslations: subgraphOutput.intermediateTranslation,
+                finalTranslation: subgraphOutput.translation
             };
         });
 };
@@ -114,9 +114,6 @@ export async function translateContent(
   const result = await graph.invoke({
     input,
     metadata,
-    paragraphs: [],
-    translations: [],
-    messages: [],
     plainText,
   });
   

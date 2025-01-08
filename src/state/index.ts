@@ -43,8 +43,14 @@ function reduceIndexToBlockId(current: IndexToBlockId, update: IndexToBlockId) {
 
 export const TranslatorStateAnnotation = Annotation.Root({
   input: Annotation<string>(),
-  intermediateTranslation: Annotation<string>(),
-  criticism: Annotation<string>(),
+  intermediateTranslations: Annotation<string[]>({
+    default: () => [],
+    value: (current, update) => [...current, ...update],
+  }),
+  criticisms: Annotation<string[]>({
+    default: () => [],
+    value: (current, update) => [...current, ...update],
+  }),
   finalTranslation: Annotation<string>(),
   metadata: Annotation<TranslationMetadata>(),
   blocks: Annotation<TranslationBlock[]>({

@@ -10,7 +10,7 @@ Consider the following:
 - Avoid slang or informal language.
 - Correct any gender/number inaccuracies.
 - Preserve <SEPERATOR> as-is if it appears.
-- Do not remove or alter HTML tags, attributes, scripts, or styles.
+- Do not remove or alter or add HTML tags, attributes, scripts, or styles.
 
 Output only the refined HTML without extra commentary.
 `;

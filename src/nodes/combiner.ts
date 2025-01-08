@@ -2,15 +2,15 @@ import { load } from 'cheerio';
 import { TranslatorStateAnnotation } from '../state';
 
 export async function combineTranslations(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
-  const { input, blocks, plainText, criticism, intermediateTranslation } = state;
+  const { input, blocks, plainText, criticisms, intermediateTranslations, finalTranslation } = state;
 
   if (plainText) {
     return {
-      finalTranslation: blocks[0].translation,
+      finalTranslation: finalTranslation,
       blocks,
       input,
-      criticism,
-      intermediateTranslation
+      criticisms,
+      intermediateTranslations,
     };
   }
 
@@ -29,7 +29,7 @@ export async function combineTranslations(state: typeof TranslatorStateAnnotatio
     finalTranslation: $.html(),
     blocks,
     input,
-    criticism,
-    intermediateTranslation
+    criticisms,
+    intermediateTranslations
   };
 } 
