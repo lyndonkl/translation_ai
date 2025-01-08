@@ -45,11 +45,11 @@ export const TranslatorStateAnnotation = Annotation.Root({
   input: Annotation<string>(),
   intermediateTranslations: Annotation<string[]>({
     default: () => [],
-    value: (current, update) => [...current, ...update],
+    value: (current, update) => [...update],
   }),
   criticisms: Annotation<string[]>({
     default: () => [],
-    value: (current, update) => [...current, ...update],
+    value: (current, update) => [...update],
   }),
   finalTranslation: Annotation<string>(),
   metadata: Annotation<TranslationMetadata>(),
@@ -72,11 +72,11 @@ export const TranslatorSubgraphAnnotation = Annotation.Root({
     input: Annotation<string>(),
     criticisms: Annotation<string[]>({
         default: () => [],
-        value: (current, update) => [...current, ...update],
+        value: (current, update) => [...update],
     }),
     intermediateTranslation: Annotation<string[]>({
         default: () => [],
-        value: (current, update) => [...current, ...update],
+        value: (current, update) => [...update],
     }),
     translation: Annotation<string>(),
     currentState: Annotation<string>({
