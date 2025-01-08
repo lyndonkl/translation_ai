@@ -1,6 +1,7 @@
 export const refinerSystemPrompt = (focus: string) => `
 Consider the following:
 
+- The translation is from {sourceLanguage} to {targetLanguage}.
 - Only address the ${focus} related feedback provided by the reviewer and nothing else.
 - Aim for clear, grammatically correct, and natural-sounding language that remains formally suitable
   for medical or technical contexts if needed.

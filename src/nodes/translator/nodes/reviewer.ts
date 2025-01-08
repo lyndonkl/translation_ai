@@ -16,7 +16,7 @@ const reviewerModel = new ChatOpenAI({
 });
 
 export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
-    const { metadata, intermediateTranslation, currentState, criticisms } = state;
+    const { metadata, intermediateTranslation, currentState, criticisms, input } = state;
     const { sourceLanguage, targetLanguage } = metadata;
     const systemPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][SYSTEM_PROMPT]);
     const userPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][USER_PROMPT]);
@@ -31,7 +31,8 @@ export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State)
     const formattedUserPrompt = await userPrompt.format({
         sourceLanguage,
         targetLanguage,
-        text: translation,
+        translatedText: translation,
+        originalText: input,
     });
 
   const response = await reviewerModel.invoke([
