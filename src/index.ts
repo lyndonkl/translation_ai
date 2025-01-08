@@ -2,7 +2,8 @@ import { START, END, StateGraph, Send } from "@langchain/langgraph";
 import { TranslatorStateAnnotation } from "./state";
 import { parseContent, combineTranslations } from "./nodes";
 import { TranslationMetadata, TranslationBlock } from "./types";
-import { mainTranslator, reviewer, refiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
+import { mainTranslator, reviewer, refiner, combiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
+import { USER_REFINER } from "./constants";
 
 const translatorSubgraph = createTranslatorSubgraph();
 
@@ -34,8 +35,8 @@ const callTranslatorGraph = async (state: typeof TranslatorStateAnnotation.State
                         return block;
                     }),
                 criticism: subgraphOutput.criticism,
-                intermediateTranslation: subgraphOutput.refinements,
-                translations: [subgraphOutput.translation]
+                intermediateTranslation: subgraphOutput.translation,
+                finalTranslation: subgraphOutput.refinements
             };
         });
 };
@@ -49,15 +50,39 @@ const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) =
         return "translatorNode";
 };
 
+const continueToReviewer = (state: typeof TranslatorSubgraphAnnotation.State): string => {
+    const currentState = state.currentState;
+
+    if (currentState === USER_REFINER) {
+        return "combiner";
+    }
+    return currentState.endsWith("REVIEWER") ? "reviewer" : "refiner";
+};
+
 export function createTranslatorSubgraph() {
     const translatorGraph = new StateGraph(TranslatorSubgraphAnnotation)
         .addNode("translator", mainTranslator)
         .addNode("reviewer", reviewer)
         .addNode("refiner", refiner)
+        .addNode("combiner", combiner)
         .addEdge(START, "translator")
-        .addEdge("translator", "reviewer")
-        .addEdge("reviewer", "refiner")
-        .addEdge("refiner", END)
+        .addConditionalEdges(
+            "translator",
+            continueToReviewer,
+            {
+                "refiner": "refiner",
+                "combiner": "combiner"
+            }
+        )
+        .addConditionalEdges(
+            "refiner",
+            continueToReviewer,
+            {
+                "reviewer": "reviewer",
+                "combiner": "combiner"
+            }
+        )
+        .addEdge("combiner", END)
         .compile();
 
     return translatorGraph;

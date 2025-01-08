@@ -1,5 +1,5 @@
 import { START, END, StateGraph, Annotation } from "@langchain/langgraph";
-import { mainTranslator, reviewer, refiner } from "./nodes";
+import { mainTranslator, reviewer, refiner, combiner } from "./nodes";
 import { TranslatorSubgraphAnnotation } from "../../state";
 
-export { mainTranslator, reviewer, refiner, TranslatorSubgraphAnnotation };
+export { mainTranslator, reviewer, refiner, combiner, TranslatorSubgraphAnnotation };

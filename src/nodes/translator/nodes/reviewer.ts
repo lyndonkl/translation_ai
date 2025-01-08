@@ -4,50 +4,40 @@ dotenv.config();
 import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { TranslatorSubgraphAnnotation } from "../../../state";
-
-const reviewPrompt = PromptTemplate.fromTemplate(`
-You are a translation critic. Evaluate the translation based on the original and translated HTML provided below. Both versions preserve all HTML tags and structure. The source language is {sourceLanguage} and the target language is {targetLanguage}. Assess the translation on the following dimensions:
-
-1. **Accuracy**: Correctness of translation, including absence of additions, mistranslations, omissions, and untranslated text.
-2. **Fluency**: Proper grammar, spelling, and punctuation in {targetLanguage}, and avoidance of unnecessary repetitions.
-3. **Style**: Consistency with the source text's style and appropriate cultural context.
-4. **Terminology**: Consistent and domain-appropriate use of terminology, including equivalent idioms in {targetLanguage}.
-5. **Consistency**: Uniformity in translation choices throughout the text.
-6. **Readability**: Ease of understanding and natural flow in the target language.
-7. **Formatting**: Preservation of HTML structure, tags, and formatting without introducing errors.
-
-**Note:** 
-- For each dimension, provide multiple bullet-point comments if applicable.
-- Omit any dimension sections that have no criticisms.
-- If there are no criticisms for any of the sections, output NONE in capital letters and nothing else.
-- **Do not include any additional text, explanations, or comments outside the specified format.**
-
-Provide the criticisms in Markdown format with headers for each dimension and bullet points for each comment.
-
-**Original HTML:**
-{originalText}
-
-**Translated HTML:**
-{translatedText}
-`);
-
+import { prompts } from "../../../prompts";
+import { SYSTEM_PROMPT, USER_PROMPT } from '../../../constants';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 const reviewerModel = new ChatOpenAI({
   modelName: "gpt-4o",
-  temperature: 0.3
+  temperature: 0.3,
+  topP: 1.0,
+  frequencyPenalty: 0.0,
+  presencePenalty: 0.0,
 });
 
 export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
-    const { metadata, translation } = state;
+    const { metadata, intermediateTranslation, currentState, criticisms } = state;
     const { sourceLanguage, targetLanguage } = metadata;
+    const systemPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][SYSTEM_PROMPT]);
+    const userPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][USER_PROMPT]);
 
-  const formattedPrompt = await reviewPrompt.format({
-    sourceLanguage,
-    targetLanguage,
-    originalText: translation.originalContent,
-    translatedText: translation.translatedContent
-  });
+    const formattedSystemPrompt = await systemPrompt.format({
+        sourceLanguage,
+        targetLanguage,
+    });
 
-  const response = await reviewerModel.invoke(formattedPrompt);
+    const translation = intermediateTranslation[intermediateTranslation.length - 1];
+
+    const formattedUserPrompt = await userPrompt.format({
+        sourceLanguage,
+        targetLanguage,
+        text: translation,
+    });
+
+  const response = await reviewerModel.invoke([
+    new SystemMessage(formattedSystemPrompt),
+    new HumanMessage(formattedUserPrompt)
+  ]);
 
   const critisimAnalysPrompt =PromptTemplate.fromTemplate(`
  You are provided with a criticism of a translation. Your task is to analyze the criticism and if the critism does not contain any recommended changes, output "NONE" in capital letters and nothing else. If it does contain recommended changes, output "CHANGES_NEEDED" in capital letters and nothing else.
@@ -63,11 +53,30 @@ export async function reviewer(state: typeof TranslatorSubgraphAnnotation.State)
   const criticismAnalysisResponse = await reviewerModel.invoke(formattedCritisimAnalysisPrompt);
 
   const criticism = criticismAnalysisResponse.content === "NONE" ? "NONE" : response.content;
-  
-  return {
-    translation: {
-        ...translation,
-      criticism: criticism.toString()
-    }
-  };
+
+  if (criticism === "NONE") {
+    return {
+      currentState: state.nextState[state.nextState[state.currentState]],
+      criticisms: [
+        ...criticisms,
+        criticism.toString()
+      ],
+      intermediateTranslation: [
+        ...state.intermediateTranslation,
+        translation
+      ]
+    };
+  } else {
+    return {
+      currentState: state.nextState[state.currentState],
+      criticisms: [
+        ...criticisms,
+        criticism.toString()
+      ],
+      intermediateTranslation: [
+        ...state.intermediateTranslation,
+        translation
+      ]
+    };
+  }
 } 

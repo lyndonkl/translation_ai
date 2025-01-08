@@ -22,3 +22,7 @@ export interface TranslationBlock {
 export interface IndexToBlockId {
   [key: number]: string;
 }
+
+export interface SubgraphStateMap {
+  [key: string]: string;
+}
