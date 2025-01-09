@@ -1,11 +1,14 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Translation } from '../src/types';
 
 interface TranslationOutput {
-  htmlContent: string;
-  translatedContent: string;
-  translations: Translation[];
+  finalTranslation: string;
+  criticisms: string[];
+  input: string;
+  metadata: {
+    sourceLanguage: string;
+    targetLanguage: string;
+  };
 }
 
 interface LanguageOutput {
@@ -117,12 +120,6 @@ async function generateHtml(folderPath: string) {
             padding: 0.5rem;
             border-radius: 50%;
         }
-        .criticism-section strong {
-            display: block;
-            color: #4B5563;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
         .criticism-text {
             white-space: pre-wrap;
             line-height: 1.6;
@@ -151,44 +148,26 @@ async function generateHtml(folderPath: string) {
             return `
             <div id="${lang}-section" class="translation-section ${lang === 'spanish' ? 'active' : ''} mb-12 bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-2xl font-bold mb-4">English → ${lang.charAt(0).toUpperCase() + lang.slice(1)}</h2>
-                <div class="translations-list">
-                    ${output?.translations?.map((t: Translation) => `
-                        <div class="translation-container">
-                            <div class="tooltip-icon">ℹ️</div>
-                            <div class="translation-pair">
-                                <div class="prose">
-                                    ${t.originalContent}
-                                </div>
-                                <div class="prose">
-                                    ${t.refinements || t.translatedContent}
-                                </div>
-                            </div>
-                            <div class="tooltip">
-                                <div class="space-y-4">
-                                    <div>
-                                        <h3 class="font-semibold text-lg mb-2">Original</h3>
-                                        <div class="section-content">${t.originalContent}</div>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold text-lg mb-2">Initial Translation</h3>
-                                        <div class="section-content">${t.translatedContent}</div>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold text-lg mb-2">Criticism</h3>
-                                        <div class="criticism-text section-content">
-                                            ${t.criticism || 'NONE'}
-                                        </div>
-                                    </div>
-                                    ${t.refinements ? `
-                                        <div>
-                                            <h3 class="font-semibold text-lg mb-2">Final Translation</h3>
-                                            <div class="section-content">${t.refinements}</div>
-                                        </div>
-                                    ` : ''}
+                <div class="translation-container">
+                    <div class="tooltip-icon">ℹ️</div>
+                    <div class="translation-pair">
+                        <div class="prose">
+                            ${output?.input || ''}
+                        </div>
+                        <div class="prose">
+                            ${output?.finalTranslation || ''}
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">Criticisms</h3>
+                                <div class="criticism-text section-content">
+                                    ${output?.criticisms?.join('\n\n') || 'NONE'}
                                 </div>
                             </div>
                         </div>
-                    `).join('') || ''}
+                    </div>
                 </div>
             </div>
         `}).join('')}

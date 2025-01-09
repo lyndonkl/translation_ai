@@ -2,32 +2,34 @@ import { load } from 'cheerio';
 import { TranslatorStateAnnotation } from '../state';
 
 export async function combineTranslations(state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> {
-  const { htmlContent, translations, blocks, plainText } = state;
+  const { input, blocks, plainText, criticisms, intermediateTranslations, finalTranslation } = state;
 
   if (plainText) {
     return {
-      translatedContent: translations.map(t => t.translatedContent).join('\n\n'),
+      finalTranslation: finalTranslation,
       blocks,
-      translations,
-      htmlContent
+      input,
+      criticisms,
+      intermediateTranslations,
     };
   }
 
-  const $ = load(htmlContent);
+  const $ = load(input);
   
-  translations.forEach(translation => {
-    const $el = $(translation.path);
+  blocks.forEach(block => {
+    const $el = $(block.path);
     if ($el.length) {
-      $el.html(translation.translatedContent);
+      $el.html(block.translation ?? "");
     } else {
-      console.log('Failed to find element:', translation.path);
+      console.log('Failed to find element:', block.path);
     }
   });
   
   return {
-    translatedContent: $.html(),
+    finalTranslation: $.html(),
     blocks,
-    translations,
-    htmlContent
+    input,
+    criticisms,
+    intermediateTranslations
   };
 } 

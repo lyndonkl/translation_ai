@@ -2,52 +2,52 @@ import { START, END, StateGraph, Send } from "@langchain/langgraph";
 import { TranslatorStateAnnotation } from "./state";
 import { parseContent, combineTranslations } from "./nodes";
 import { TranslationMetadata, TranslationBlock } from "./types";
-import { mainTranslator, reviewer, refiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
+import { mainTranslator, reviewer, refiner, combiner, TranslatorSubgraphAnnotation } from "./nodes/translator";
+import { USER_REFINER } from "./constants";
 
-interface SubgraphStateMap {
-    block: TranslationBlock;
-    metadata: TranslationMetadata;
-}
+const passToNextState = (state: typeof TranslatorSubgraphAnnotation.State): string => {
+    const currentState = state.currentState;
 
-const continueFromTranslator = (state: typeof TranslatorSubgraphAnnotation.State) => {
-    if (state.fastTranslate) {
-        return END;
+    if (currentState === USER_REFINER) {
+        return "combiner";
     }
-    return "reviewer";
+    return currentState.endsWith("REVIEWER") ? "reviewer" : "refiner";
 };
 
 const translatorSubgraph = createTranslatorSubgraph();
 
 // Function to call translator subgraph and transform state
-const callTranslatorGraph = async (state: SubgraphStateMap): Promise<Partial<typeof TranslatorStateAnnotation.State>> => {
+const callTranslatorGraph = async (state: typeof TranslatorStateAnnotation.State): Promise<Partial<typeof TranslatorStateAnnotation.State>> => {
     
     // Transform main state to subgraph state
     const subgraphInput = {
-        block: state.block,
+        input: state.blocks.map(block => block.content).join('<SEPARATOR>'),
         metadata: state.metadata,
-        translation: ""
     };
 
     // Call subgraph
     return translatorSubgraph.invoke(subgraphInput)
-        .then(subgraphOutput => ({
-            translations: [subgraphOutput.translation]
-        }));
-};
-
-// Function to map paragraphs to translator tasks
-const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
-    if (state.blocks.length === 0) {
-        return new Send("combiner", state);
-    }
-    // Send each block to translator node
-    return state.blocks.map(
-        (block) => new Send("translatorNode", { 
-            block,
-            metadata: state.metadata,
-            fastTranslate: state.fastTranslate
-        })
-    );
+        .then(subgraphOutput => {
+            const translations = subgraphOutput.translation.split('<SEPARATOR>');
+            return {
+                blocks: state.plainText ? 
+                    state.blocks.map((block, index) => index === 0 ? 
+                        { ...block, translation: subgraphOutput.translation } : block
+                    ) :
+                    state.blocks.map((block, index) => {
+                        if (state.indexToBlockId[index] === block.id) {
+                            return {
+                                ...block,
+                                translation: translations[index]
+                            };
+                        }
+                        return block;
+                    }),
+                criticisms: subgraphOutput.criticisms,
+                intermediateTranslations: subgraphOutput.intermediateTranslation,
+                finalTranslation: subgraphOutput.translation
+            };
+        });
 };
 
 export function createTranslatorSubgraph() {
@@ -55,21 +55,34 @@ export function createTranslatorSubgraph() {
         .addNode("translator", mainTranslator)
         .addNode("reviewer", reviewer)
         .addNode("refiner", refiner)
+        .addNode("combiner", combiner)
         .addEdge(START, "translator")
+        .addEdge("translator", "reviewer")
+        .addEdge("reviewer", "refiner")
         .addConditionalEdges(
-            "translator",
-            continueFromTranslator,
+            "refiner",
+            passToNextState,
             {
                 "reviewer": "reviewer",
-                END: END
+                "refiner": "refiner",
+                "combiner": "combiner"
             }
         )
-        .addEdge("reviewer", "refiner")
-        .addEdge("refiner", END)
+        .addEdge("combiner", END)
         .compile();
 
     return translatorGraph;
 }
+
+// Function to map paragraphs to translator tasks
+const continueToTranslations = (state: typeof TranslatorStateAnnotation.State) => {
+    if (state.blocks.length === 0) {
+        return "combiner";
+    }
+
+    // Send each block to translator node
+    return "translatorNode";
+};
 
 export function createTranslationGraph() {
     const graph = new StateGraph(TranslatorStateAnnotation)
@@ -80,7 +93,10 @@ export function createTranslationGraph() {
         .addConditionalEdges(
             "parser",
             continueToTranslations,
-            ["translatorNode", "combiner"]
+            {   
+                "translatorNode": "translatorNode",
+                "combiner": "combiner"
+            }
         )
         .addEdge("translatorNode", "combiner")
         .addEdge("combiner", END)
@@ -90,20 +106,15 @@ export function createTranslationGraph() {
 }
 
 export async function translateContent(
-  htmlContent: string,
+  input: string,
   metadata: TranslationMetadata,
-  plainText: boolean,
-  fastTranslate: boolean
+  plainText: boolean
 ) {
   const graph = createTranslationGraph();
   const result = await graph.invoke({
-    htmlContent,
+    input,
     metadata,
-    paragraphs: [],
-    translations: [],
-    messages: [],
     plainText,
-    fastTranslate
   });
   
   return result;

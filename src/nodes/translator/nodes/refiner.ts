@@ -4,67 +4,66 @@ dotenv.config();
 import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { TranslatorSubgraphAnnotation } from "../../../state";
-
-const refinePrompt = PromptTemplate.fromTemplate(`
-You are a Translation Editor. Your task is to refine the translated HTML based on the provided criticisms while preserving the original HTML structure and tags. You will receive the original HTML, the translated HTML, the source language, and the target language. Only modify the text content that is displayed to users. Do not alter any HTML tags, attributes, scripts, or styles.
-
-**Source Language:** {sourceLanguage}  
-**Target Language:** {targetLanguage}
-
-**Original HTML:**
-{originalText}
-
-**Translated HTML:**
-{translatedText}
-
-**Criticism:**
-{criticism}
-
-**Instructions:**
-1. **Address All Applicable Criticisms**: Refine the translated HTML by systematically addressing each criticism provided. If a criticism cannot be addressed, retain the original translated content for that section.
-2. **Preserve HTML Structure**: Do not alter any HTML tags, attributes, scripts, or styles. Only modify the text content intended for user display.
-3. **Maintain Formatting**: Keep the original formatting, indentation, and line breaks intact.
-4. **Preserve Writing Style**: Ensure that the writing style, tone, and information of the original text are maintained in the refined translation.
-5. **No Additional Content: Output only the refined translated HTML**: without any additional text, explanations, or comments.
-6. **Handle No Criticism**: If no criticisms are provided, output the original translated HTML as is, without any explanations..
-`);
+import { prompts } from '../../../prompts';
+import { SYSTEM_PROMPT, USER_PROMPT, USER_REFINER } from '../../../constants';
+import { SystemMessage } from '@langchain/core/messages';
+import { HumanMessage } from '@langchain/core/messages';
+import { feedback } from '../../../prompts/feedback';
 
 const refinerModel = new ChatOpenAI({
-  modelName: "gpt-4",
-  temperature: 0.2
+  modelName: "gpt-4o",
+  temperature: 0.3,
+  topP: 1.0,
+  frequencyPenalty: 0.0,
+  presencePenalty: 0.0,
 });
 
 export async function refiner(state: typeof TranslatorSubgraphAnnotation.State): Promise<Partial<typeof TranslatorSubgraphAnnotation.State>> {
-  const { translation, metadata } = state;
+  const { intermediateTranslation, criticisms, metadata, currentState, input } = state;
+  const translation = intermediateTranslation[intermediateTranslation.length - 1];
+  const { sourceLanguage, targetLanguage } = metadata;
+  const criticism = criticisms[criticisms.length - 1];
 
-  if (translation.criticism === "NONE") {
+  if (criticism === "NONE") {
     return {
-      translation: {
-        ...translation,
-        refinements: translation.translatedContent
-      }
+      currentState: state.nextState[state.currentState],
     };
   }
-  
-  const { sourceLanguage, targetLanguage } = metadata;
-  
-  const formattedPrompt = await refinePrompt.format({
-    originalText: translation.originalContent,
-    translatedText: translation.translatedContent,
-    criticism: translation.criticism,
+
+  const systemPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][SYSTEM_PROMPT]);
+  const userPrompt = PromptTemplate.fromTemplate(prompts[currentState as keyof typeof prompts][USER_PROMPT]);
+
+  const formattedSystemPrompt = await systemPrompt.format({
     sourceLanguage,
-    targetLanguage
+    targetLanguage,
   });
 
-  const response = await refinerModel.invoke(formattedPrompt);
+  let formattedUserPrompt = await userPrompt.format({
+    translatedText: translation,
+    originalText: input,
+    criticism: criticism
+  });
+
+  if (currentState === USER_REFINER) {
+    const feedbackItem = feedback[`${sourceLanguage}-to-${targetLanguage}` as keyof typeof feedback];
+    formattedUserPrompt = await userPrompt.format({
+      feedback: feedbackItem
+    });
+  }
+
+
+  const response = await refinerModel.invoke([
+    new SystemMessage(formattedSystemPrompt),
+    new HumanMessage(formattedUserPrompt)
+  ]);
   
-  const refinements = response.content || [];
+  const refinements = response.content;
   
   return {
-    translation: {
-      ...translation,
-      translatedContent: translation.translatedContent,
-      refinements: refinements.toString()
-    }
+    intermediateTranslation: [
+      ...intermediateTranslation,
+      refinements.toString()
+    ],
+    currentState: state.nextState[state.currentState],
   };
 } 

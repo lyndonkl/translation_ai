@@ -25,7 +25,7 @@ async function processFolder(folderPath: string) {
     }
 
     const inputPath = path.join(folderPath, 'input.txt');
-    const htmlContent = await fs.readFile(inputPath, 'utf-8');
+    const input = await fs.readFile(inputPath, 'utf-8');
 
     for (const targetLanguage of TARGET_LANGUAGES) {
       console.log(`Translating ${folderPath} to ${targetLanguage}...`);
@@ -35,7 +35,7 @@ async function processFolder(folderPath: string) {
         targetLanguage
       };
 
-      const result = await translateContent(htmlContent, metadata, true, false);
+      const result = await translateContent(input, metadata, true);
       
       // Write output
       const outputFileName = `output_${targetLanguage}.json`;
