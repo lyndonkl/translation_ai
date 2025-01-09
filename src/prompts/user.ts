@@ -1,4 +1,3 @@
-import { feedback } from "./feedback";
 import { refinerSystemPrompt, refinerUserPrompt } from "./refiner";
 
 export const userRefinerSystemPrompt = `
@@ -12,7 +11,7 @@ as long as it is relevant to improving the current translation.
 ${refinerSystemPrompt('Past Feedback')}
 `;
 
-export const userRefinerUserPrompt = (sourceLanguage: string, targetLanguage: string) => `
+export const userRefinerUserPrompt = `
 Refine the following translated HTML, addressing each listed feedback item.
 The article has been thoroughly reviewed on all dimensions, but insights or preferences from 
 previous unrelatedtranslations or user comments should be applied now.
@@ -24,7 +23,7 @@ previous unrelatedtranslations or user comments should be applied now.
 {translatedText}
 
 **Past Feedback:**
-${feedback[`${sourceLanguage}-to-${targetLanguage}` as keyof typeof feedback]}
+{feedback}
 
 ${refinerUserPrompt}
 `;

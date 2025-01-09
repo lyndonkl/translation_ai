@@ -70,6 +70,10 @@ export const TranslatorStateAnnotation = Annotation.Root({
 export const TranslatorSubgraphAnnotation = Annotation.Root({
     metadata: Annotation<TranslationMetadata>(),
     input: Annotation<string>(),
+    plainText: Annotation<boolean>({
+        reducer: (current, update) => update,
+        default: () => false,
+    }),
     criticisms: Annotation<string[]>({
         default: () => [],
         value: (current, update) => [...update],

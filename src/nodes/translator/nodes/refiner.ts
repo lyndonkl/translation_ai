@@ -5,10 +5,10 @@ import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { TranslatorSubgraphAnnotation } from "../../../state";
 import { prompts } from '../../../prompts';
-import { SYSTEM_PROMPT, USER_PROMPT } from '../../../constants';
+import { SYSTEM_PROMPT, USER_PROMPT, USER_REFINER } from '../../../constants';
 import { SystemMessage } from '@langchain/core/messages';
 import { HumanMessage } from '@langchain/core/messages';
-
+import { feedback } from '../../../prompts/feedback';
 
 const refinerModel = new ChatOpenAI({
   modelName: "gpt-4o",
@@ -38,11 +38,18 @@ export async function refiner(state: typeof TranslatorSubgraphAnnotation.State):
     targetLanguage,
   });
 
-  const formattedUserPrompt = await userPrompt.format({
+  let formattedUserPrompt = await userPrompt.format({
     translatedText: translation,
     originalText: input,
     criticism: criticism
-  }); 
+  });
+
+  if (currentState === USER_REFINER) {
+    const feedbackItem = feedback[`${sourceLanguage}-to-${targetLanguage}` as keyof typeof feedback];
+    formattedUserPrompt = await userPrompt.format({
+      feedback: feedbackItem
+    });
+  }
 
 
   const response = await refinerModel.invoke([

@@ -41,6 +41,10 @@ import {
     terminologyReviwerSystemPrompt,
     terminologyReviwerUserPrompt
 } from "./terminology";
+import {
+    userRefinerSystemPrompt,
+    userRefinerUserPrompt
+} from "./user";
 
 import {
     TRANSLATOR,
@@ -59,14 +63,11 @@ import {
     TERMINOLOGY_REVIEWER,
     TERMINOLOGY_REFINER,
     SYSTEM_PROMPT,
-    USER_PROMPT
+    USER_PROMPT,
+    USER_REFINER
 } from "../constants";
 
 const prompts = {
-    [TRANSLATOR]: {
-        [SYSTEM_PROMPT]: translatorSystemPrompt,
-        [USER_PROMPT]: translatorUserPrompt
-    },
     [ACCURACY_REVIEWER]: {
         [SYSTEM_PROMPT]: accuracyReviwerSystemPrompt,
         [USER_PROMPT]: accuracyReviwerUserPrompt
@@ -122,6 +123,10 @@ const prompts = {
     [TERMINOLOGY_REFINER]: {
         [SYSTEM_PROMPT]: terminologyRefinerSystemPrompt,
         [USER_PROMPT]: terminologyRefinerUserPrompt
+    },
+    [USER_REFINER]: {
+        [SYSTEM_PROMPT]: userRefinerSystemPrompt,
+        [USER_PROMPT]: userRefinerUserPrompt
     }
 }
 
