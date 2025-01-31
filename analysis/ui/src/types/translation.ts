@@ -33,4 +33,6 @@ export interface TranslationRating {
 export interface TranslationReview {
   ratings: TranslationRating[];
   lastModified: string;
+  sourceText: string;
+  translationText: string;
 } 

@@ -12,7 +12,7 @@ interface DualEditorProps {
 
 type HighlightPart = string | JSX.Element;
 
-const DualEditor: React.FC<DualEditorProps> = ({
+const DualEditor: React.FC<DualEditorProps> = React.memo(({
   sourceText,
   targetText,
   onSourceSelect,
@@ -171,6 +171,6 @@ const DualEditor: React.FC<DualEditorProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default DualEditor; 
