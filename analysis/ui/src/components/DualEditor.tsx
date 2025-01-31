@@ -19,17 +19,17 @@ const DualEditor: React.FC<DualEditorProps> = ({
   savedSelections = [],
   onClearSelections,
 }) => {
-  const [sourceSelection, setSourceSelection] = useState<string>('');
   const [sourceHighlight, setSourceHighlight] = useState<string>('');
   const [targetHighlight, setTargetHighlight] = useState<string>('');
   const [isSelecting, setIsSelecting] = useState(false);
 
-  // Clear selections on document click
   useEffect(() => {
-    const handleDocumentClick = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest('.editor-content') && !isSelecting) {
-        clearCurrentSelections();
+        setSourceHighlight('');
+        setTargetHighlight('');
+        onClearSelections?.();
       }
     };
 
@@ -37,58 +37,48 @@ const DualEditor: React.FC<DualEditorProps> = ({
       setIsSelecting(false);
     };
 
-    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener('click', handleClick);
     document.addEventListener('mouseup', handleMouseUp);
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('click', handleClick);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isSelecting]);
-
-  const clearCurrentSelections = () => {
-    setSourceSelection('');
-    setSourceHighlight('');
-    setTargetHighlight('');
-    onClearSelections?.();
-  };
+  }, [onClearSelections, isSelecting]);
 
   const handleSourceSelect = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
     event.stopPropagation();
     setIsSelecting(true);
-
+    
     const selection = window.getSelection();
-    if (selection && selection.toString()) {
-      const selectedText = selection.toString().trim();
-      if (selectedText) {
-        setSourceSelection(selectedText);
-        setSourceHighlight(selectedText);
-        setTargetHighlight(''); // Clear target highlight when selecting source
-        onSourceSelect(selectedText);
-      }
-    } else if (!isSelecting) {
-      clearCurrentSelections();
+    const selectedText = selection?.toString().trim() || '';
+
+    if (selectedText) {
+      setSourceHighlight(selectedText);
+      setTargetHighlight('');
+      onSourceSelect(selectedText);
+    } else {
+      setSourceHighlight('');
+      setTargetHighlight('');
+      onSourceSelect('');
     }
-  }, [onSourceSelect, isSelecting]);
+  }, [onSourceSelect]);
 
   const handleTargetSelect = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
     event.stopPropagation();
     setIsSelecting(true);
-
+    
     const selection = window.getSelection();
-    if (selection && selection.toString()) {
-      const selectedText = selection.toString().trim();
-      if (selectedText && sourceSelection) {
-        setTargetHighlight(selectedText);
-        onTargetSelect(selectedText);
-      } else if (selectedText) {
-        clearCurrentSelections();
-      }
-    } else if (!isSelecting) {
-      clearCurrentSelections();
+    const selectedText = selection?.toString().trim() || '';
+
+    if (selectedText) {
+      setTargetHighlight(selectedText);
+      onTargetSelect(selectedText);
+    } else {
+      setSourceHighlight('');
+      setTargetHighlight('');
+      onTargetSelect('');
     }
-  }, [onTargetSelect, sourceSelection, isSelecting]);
+  }, [onTargetSelect]);
 
   const renderWithHighlights = (text: string, currentHighlight: string, type: 'source' | 'target'): ReactNode[] => {
     let parts: HighlightPart[] = [text];
