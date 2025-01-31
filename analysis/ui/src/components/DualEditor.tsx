@@ -7,6 +7,7 @@ interface DualEditorProps {
   onTargetSelect: (text: string) => void;
   savedSelections?: Array<{ source: string; target: string }>;
   onClearSelections?: () => void;
+  onSavedSelectionClick?: (source: string, target: string) => void;
 }
 
 type HighlightPart = string | JSX.Element;
@@ -18,6 +19,7 @@ const DualEditor: React.FC<DualEditorProps> = ({
   onTargetSelect,
   savedSelections = [],
   onClearSelections,
+  onSavedSelectionClick,
 }) => {
   const [sourceHighlight, setSourceHighlight] = useState<string>('');
   const [targetHighlight, setTargetHighlight] = useState<string>('');
@@ -80,6 +82,20 @@ const DualEditor: React.FC<DualEditorProps> = ({
     }
   }, [onTargetSelect]);
 
+  const handleSavedSelectionClick = useCallback((event: React.MouseEvent, savedText: string, type: 'source' | 'target') => {
+    event.stopPropagation();
+    // Find the matching saved selection
+    const savedSelection = savedSelections.find(selection => 
+      type === 'source' 
+        ? selection.source === savedText
+        : selection.target === savedText
+    );
+    
+    if (savedSelection) {
+      onSavedSelectionClick?.(savedSelection.source, savedSelection.target);
+    }
+  }, [savedSelections, onSavedSelectionClick]);
+
   const renderWithHighlights = (text: string, currentHighlight: string, type: 'source' | 'target'): ReactNode[] => {
     let parts: HighlightPart[] = [text];
     
@@ -90,7 +106,7 @@ const DualEditor: React.FC<DualEditorProps> = ({
       return text.indexOf(bText) - text.indexOf(aText);
     });
 
-    // Apply saved selections (green highlights)
+    // Apply saved selections (green highlights) with click handler
     sortedSelections.forEach(({ source, target }) => {
       const searchText = type === 'source' ? source : target;
       parts = parts.flatMap(part => {
@@ -99,7 +115,13 @@ const DualEditor: React.FC<DualEditorProps> = ({
           if (index === -1) return [part];
           return [
             part.slice(0, index),
-            <span key={`saved-${searchText}`} className="bg-green-200">{searchText}</span>,
+            <span 
+              key={`saved-${searchText}`} 
+              className="bg-green-200 cursor-pointer hover:bg-green-300"
+              onClick={(e) => handleSavedSelectionClick(e, searchText, type)}
+            >
+              {searchText}
+            </span>,
             part.slice(index + searchText.length)
           ].filter(Boolean);
         }

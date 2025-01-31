@@ -18,6 +18,7 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = ({
     ratings: [],
     lastModified: new Date().toISOString(),
   });
+  const [editingRating, setEditingRating] = useState<TranslationRating | null>(null);
 
   const handleSourceSelect = useCallback((text: string) => {
     setSelectedSource(text);
@@ -37,20 +38,52 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = ({
     }
   }, [selectedSource]);
 
+  const handleSavedSelectionClick = useCallback((source: string, target: string) => {
+    // Find the existing rating for this selection
+    const existingRating = review.ratings.find(
+      rating => rating.sourceSegment === source && rating.targetSegment === target
+    );
+
+    if (existingRating) {
+      setEditingRating(existingRating);
+      setSelectedSource(source);
+      setSelectedTarget(target);
+      setIsModalOpen(true);
+    }
+  }, [review.ratings]);
+
   const handleSaveRating = useCallback((rating: TranslationRating) => {
     const updatedReview = {
       ...review,
-      ratings: [...review.ratings, rating],
+      ratings: editingRating
+        // If editing, replace the old rating
+        ? review.ratings.map(r => 
+            r === editingRating ? { ...rating, lastModified: new Date().toISOString() } : r
+          )
+        // If new, add to the list
+        : [...review.ratings, { ...rating, lastModified: new Date().toISOString() }],
       lastModified: new Date().toISOString(),
     };
 
-    // Only update local state, don't save to parent yet
     setReview(updatedReview);
-    setSavedSelections(prev => [...prev, { source: selectedSource, target: selectedTarget }]);
+    setSavedSelections(prev => {
+      if (editingRating) {
+        // Replace the existing selection
+        return prev.map(s => 
+          s.source === editingRating.sourceSegment
+            ? { source: rating.sourceSegment, target: rating.targetSegment }
+            : s
+        );
+      }
+      // Add new selection
+      return [...prev, { source: selectedSource, target: selectedTarget }];
+    });
+
     setIsModalOpen(false);
     setSelectedSource('');
     setSelectedTarget('');
-  }, [review, selectedSource, selectedTarget]);
+    setEditingRating(null);
+  }, [review, editingRating, selectedSource, selectedTarget]);
 
   const handleSaveToFile = useCallback(async () => {
     try {
@@ -114,8 +147,10 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = ({
 
   const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
-    handleClearSelections();
-  }, [handleClearSelections]);
+    setSelectedSource('');
+    setSelectedTarget('');
+    setEditingRating(null);
+  }, []);
 
   const handleLoadReviews = useCallback(async () => {
     try {
@@ -216,6 +251,7 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = ({
           onTargetSelect={handleTargetSelect}
           savedSelections={savedSelections}
           onClearSelections={handleClearSelections}
+          onSavedSelectionClick={handleSavedSelectionClick}
         />
 
         {isModalOpen && (
@@ -225,6 +261,7 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = ({
             sourceSegment={selectedSource}
             targetSegment={selectedTarget}
             onSave={handleSaveRating}
+            initialRating={editingRating}
           />
         )}
       </div>

@@ -6,18 +6,26 @@ export interface TranslationMetadata {
 export interface TranslationOutput {
   input: string;
   finalTranslation: string;
-  criticisms: string[];
-  metadata: TranslationMetadata;
+  metadata: {
+    sourceLanguage: string;
+    targetLanguage: string;
+    model: string;
+    timestamp: string;
+  };
 }
 
 export interface TranslationRating {
   sourceSegment: string;
   targetSegment: string;
+  lastModified: string;
   ratings: {
     accuracy: number;
     fluency: number;
     style: number;
     consistency: number;
+    formatting: number;
+    readability: number;
+    terminology: number;
   };
   comments?: string;
 }
