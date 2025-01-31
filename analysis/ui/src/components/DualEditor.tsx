@@ -83,34 +83,41 @@ const DualEditor: React.FC<DualEditorProps> = ({
   const renderWithHighlights = (text: string, currentHighlight: string, type: 'source' | 'target'): ReactNode[] => {
     let parts: HighlightPart[] = [text];
     
-    // First, handle saved selections
-    savedSelections.forEach(({ source, target }) => {
+    // First, handle saved selections in a stable way
+    const sortedSelections = [...savedSelections].sort((a, b) => {
+      const aText = type === 'source' ? a.source : a.target;
+      const bText = type === 'source' ? b.source : b.target;
+      return text.indexOf(bText) - text.indexOf(aText);
+    });
+
+    // Apply saved selections (green highlights)
+    sortedSelections.forEach(({ source, target }) => {
+      const searchText = type === 'source' ? source : target;
       parts = parts.flatMap(part => {
-        const searchText = type === 'source' ? source : target;
         if (typeof part === 'string') {
-          return part.split(searchText).map((subPart, i, arr) => {
-            if (i === arr.length - 1) return subPart;
-            return [
-              subPart,
-              <span key={`saved-${i}`} className="bg-green-200">{searchText}</span>
-            ] as HighlightPart[];
-          }).flat();
+          const index = part.indexOf(searchText);
+          if (index === -1) return [part];
+          return [
+            part.slice(0, index),
+            <span key={`saved-${searchText}`} className="bg-green-200">{searchText}</span>,
+            part.slice(index + searchText.length)
+          ].filter(Boolean);
         }
         return [part];
       });
     });
 
-    // Then, handle current selection
+    // Then handle current selection (yellow highlight)
     if (currentHighlight) {
       parts = parts.flatMap(part => {
         if (typeof part === 'string') {
-          return part.split(currentHighlight).map((subPart, i, arr) => {
-            if (i === arr.length - 1) return subPart;
-            return [
-              subPart,
-              <span key={`current-${i}`} className="bg-yellow-200">{currentHighlight}</span>
-            ] as HighlightPart[];
-          }).flat();
+          const index = part.indexOf(currentHighlight);
+          if (index === -1) return [part];
+          return [
+            part.slice(0, index),
+            <span key={`current-${currentHighlight}`} className="bg-yellow-200">{currentHighlight}</span>,
+            part.slice(index + currentHighlight.length)
+          ].filter(Boolean);
         }
         return [part];
       });
