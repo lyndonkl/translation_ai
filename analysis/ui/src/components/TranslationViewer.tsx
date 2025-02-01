@@ -139,6 +139,31 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = React.memo(({
     setEditingRating(null);
   }, [review, editingRating, selectedSource, selectedTarget, translation]);
 
+  const handleDeleteRating = useCallback(() => {
+    if (editingRating) {
+      const updatedReview = {
+        ...review,
+        ratings: review.ratings.filter(r => r !== editingRating),
+        lastModified: new Date().toISOString(),
+        sourceText: translation.input,
+        translationText: translation.finalTranslation
+      };
+
+      setReview(updatedReview);
+      setSavedSelections(prev => 
+        prev.filter(s => 
+          s.source !== editingRating.sourceSegment || 
+          s.target !== editingRating.targetSegment
+        )
+      );
+
+      setIsModalOpen(false);
+      setSelectedSource('');
+      setSelectedTarget('');
+      setEditingRating(null);
+    }
+  }, [review, editingRating, translation]);
+
   const handleClearSelections = useCallback(() => {
     setSelectedSource('');
     setSelectedTarget('');
@@ -177,6 +202,7 @@ export const TranslationViewer: React.FC<TranslationViewerProps> = React.memo(({
             sourceSegment={selectedSource}
             targetSegment={selectedTarget}
             onSave={handleSaveRating}
+            onDelete={editingRating ? handleDeleteRating : undefined}
             initialRating={editingRating}
           />
         )}

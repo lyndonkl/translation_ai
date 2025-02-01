@@ -10,7 +10,8 @@
     "dev": "ts-node src/index.ts",
     "build:watch": "tsc --watch",
     "link:local": "npm link && cd ./notebooks && npm link translator-graph",
-    "analyze": "ts-node analysis/translate.ts",
+    "translate": "ts-node analysis/translate.ts",
+    "generate": "ts-node analysis/processContent.ts",
     "render": "ts-node analysis/render.ts"
   },
   "dependencies": {

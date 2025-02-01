@@ -8,6 +8,7 @@ interface RatingModalProps {
   sourceSegment: string;
   targetSegment: string;
   onSave: (rating: TranslationRating) => void;
+  onDelete?: () => void;
   initialRating?: TranslationRating | null;
 }
 
@@ -109,6 +110,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
   sourceSegment,
   targetSegment,
   onSave,
+  onDelete,
   initialRating = null,
 }) => {
   const [rating, setRating] = useState({
@@ -243,19 +245,29 @@ const RatingModal: React.FC<RatingModalProps> = ({
             </div>
 
             <div className="sticky bottom-0 bg-white p-6 border-t">
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={onClose}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => onSave(rating)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Add Rating
-                </button>
+              <div className="flex justify-between">
+                {initialRating && onDelete && (
+                  <button
+                    onClick={onDelete}
+                    className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
+                  >
+                    Delete Rating
+                  </button>
+                )}
+                <div className="flex space-x-4">
+                  <button
+                    onClick={onClose}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => onSave(rating)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    {initialRating ? 'Update Rating' : 'Add Rating'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
