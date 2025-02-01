@@ -9,8 +9,11 @@ function injectTranslationData(): Plugin {
   return {
     name: 'inject-translation-data',
     transformIndexHtml(html) {
-      // Read translation data from test1 folder
-      const testDir = path.resolve(__dirname, '../testing/test1');
+      // Get the test folder from environment variable
+      const testFolder = process.env.VITE_TEST_FOLDER || 'test1';
+      
+      // Read translation data from the specified test folder
+      const testDir = path.resolve(__dirname, '../testing', testFolder);
       const translations: Record<string, any> = {};
       
       ['spanish', 'arabic', 'vietnamese', 'chinese'].forEach(lang => {
